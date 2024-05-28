@@ -1,0 +1,33 @@
+function F = Force_Alignement(I, X, V, N, Size, gamma)
+    % Calcul de la force d'alignement qui s'exerce sur l'individu I de la part des autres et du groupe
+
+        
+    
+        % Initialisation de la force et de la vitesse moyenne des voisins
+    F = [0; 0; 0];
+    V_i_vois = [0; 0; 0];
+
+    % Boucle sur tous les individus pour calculer la contribution à la force d'alignement
+    for j = 1:N
+        if j ~= I
+            % Calcul de la distance caractéristique L0
+            L0 = 5 * (Size(I) + Size(j));
+            % Calcul de la distance entre les individus I et j
+            d_ij = norm(X(:, I) - X(:, j));
+            % Mise à jour de la vitesse moyenne des voisins pondérée par la distance
+            
+            V_i_vois = V_i_vois + V(:, j) * exp(-2 * d_ij / L0);
+        end
+    end
+
+    % Normalisation de la vitesse moyenne des voisins
+    norm_V_i_vois = norm(V_i_vois);
+    if norm_V_i_vois > 0
+        N_i_vois = V_i_vois / norm_V_i_vois;
+        % Calcul de la force d'alignement
+        F = gamma * (norm(V(:, I)) * N_i_vois - V(:, I));
+    else
+        % Si la norme est zéro, évite la division par zéro
+        F = [0; 0; 0];
+    end
+end
